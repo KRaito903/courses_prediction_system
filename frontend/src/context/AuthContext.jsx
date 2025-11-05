@@ -60,20 +60,23 @@ export const AuthProvider = ({ children }) => {
     };
 
     // Hàm tạo profile - Gọi SAU KHI user đã verify email
-    const createUserProfile = async () => {
-        if (!currentUser) {
-            console.log('⚠️ Không có currentUser');
+    // Có thể truyền user object vào để tránh dependency issue
+    const createUserProfile = async (user = null) => {
+        const targetUser = user || currentUser;
+        
+        if (!targetUser) {
+            console.log('⚠️ Không có user');
             return false;
         }
 
-        if (!currentUser.emailVerified) {
+        if (!targetUser.emailVerified) {
             console.log('⚠️ User chưa verify email');
             return false;
         }
 
         try {
             // Kiểm tra localStorage cho pending profile data
-            const pendingDataStr = localStorage.getItem(`pendingProfile_${currentUser.uid}`);
+            const pendingDataStr = localStorage.getItem(`pendingProfile_${targetUser.uid}`);
             
             if (!pendingDataStr) {
                 console.log('ℹ️ Không có pending profile data');
@@ -83,14 +86,14 @@ export const AuthProvider = ({ children }) => {
             const profileData = JSON.parse(pendingDataStr);
             
             // Lấy token
-            const token = await currentUser.getIdToken();
+            const token = await targetUser.getIdToken();
             
             // Gọi API tạo profile
             console.log('📝 Đang tạo profile trong Firestore...');
             await profileService.createProfile(token, profileData);
             
             // Xóa pending data sau khi tạo thành công
-            localStorage.removeItem(`pendingProfile_${currentUser.uid}`);
+            localStorage.removeItem(`pendingProfile_${targetUser.uid}`);
             
             console.log('✅ Profile đã được tạo thành công!');
             alert('🎉 Chào mừng! Tài khoản của bạn đã được kích hoạt.');
@@ -102,7 +105,7 @@ export const AuthProvider = ({ children }) => {
                 error.message?.includes('409') ||
                 error.message?.includes('Document already exists')) {
                 console.log('✅ Profile đã tồn tại');
-                localStorage.removeItem(`pendingProfile_${currentUser.uid}`);
+                localStorage.removeItem(`pendingProfile_${targetUser.uid}`);
                 return true;
             }
             
@@ -115,14 +118,28 @@ export const AuthProvider = ({ children }) => {
     const login = async (email, password) => {
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
         
+        // QUAN TRỌNG: Reload user để lấy trạng thái emailVerified mới nhất
+        await userCredential.user.reload();
+        
+        console.log('🔄 User reloaded. EmailVerified:', userCredential.user.emailVerified);
+        
         // Sau khi đăng nhập thành công, check và tạo profile nếu cần
         if (userCredential.user.emailVerified) {
-            // Đợi một chút để currentUser được set bởi onAuthStateChanged
-            setTimeout(() => {
-                createUserProfile().catch(err => {
+            // Đợi một chút để đảm bảo auth state được cập nhật
+            setTimeout(async () => {
+                try {
+                    const freshUser = auth.currentUser;
+                    if (freshUser) {
+                        await freshUser.reload();
+                        await createUserProfile(freshUser);
+                    }
+                } catch (err) {
                     console.error('Error creating profile after login:', err);
-                });
+                }
             }, 1000);
+        } else {
+            console.log('⚠️ Email chưa được xác thực. Vui lòng kiểm tra email và đăng nhập lại.');
+            alert('⚠️ Email chưa được xác thực.\n\nVui lòng kiểm tra hộp thư đến (hoặc spam) và click vào link xác thực, sau đó đăng nhập lại.');
         }
         
         return userCredential;
@@ -136,24 +153,42 @@ export const AuthProvider = ({ children }) => {
     // Theo dõi trạng thái đăng nhập
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, async (user) => {
-            setCurrentUser(user);
-            
-            // Nếu user vừa verify email và đăng nhập, tự động tạo profile
-            if (user && user.emailVerified) {
-                const pendingDataStr = localStorage.getItem(`pendingProfile_${user.uid}`);
-                if (pendingDataStr) {
-                    console.log('🔄 Phát hiện pending profile, đang tạo...');
-                    try {
-                        await createUserProfile();
-                    } catch (error) {
-                        console.error('Error auto-creating profile:', error);
+            if (user) {
+                // Reload user để đảm bảo có trạng thái emailVerified mới nhất
+                try {
+                    await user.reload();
+                    // Get fresh user data sau khi reload
+                    const freshUser = auth.currentUser;
+                    setCurrentUser(freshUser);
+                    
+                    console.log('👤 User loaded. EmailVerified:', freshUser?.emailVerified);
+                    
+                    // Nếu user đã verify email và có pending profile, tạo profile
+                    if (freshUser && freshUser.emailVerified) {
+                        const pendingDataStr = localStorage.getItem(`pendingProfile_${freshUser.uid}`);
+                        if (pendingDataStr) {
+                            console.log('🔄 Phát hiện pending profile, đang tạo...');
+                            // Delay nhỏ để đảm bảo currentUser đã được set
+                            setTimeout(async () => {
+                                try {
+                                    await createUserProfile(freshUser);
+                                } catch (error) {
+                                    console.error('Error auto-creating profile:', error);
+                                }
+                            }, 500);
+                        }
                     }
+                } catch (error) {
+                    console.error('Error reloading user:', error);
+                    setCurrentUser(user);
                 }
+            } else {
+                setCurrentUser(null);
             }
             
             setLoading(false);
         });
-        return unsubscribe; // Dọn dẹp khi unmount
+        return unsubscribe;
     }, []);
 
     const value = {
