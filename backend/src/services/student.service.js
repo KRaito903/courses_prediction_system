@@ -1,13 +1,12 @@
-import e from 'express';
-import { db } from '../services/firebase.service';
+import { db } from '../config/firebase.config.js';
 
 
-studentCollection = db.collection('students');
+const studentCollection = db.collection('students');
 //  --CREATE STUDENT--
 // Create new student
 const createStudent = async (studentData) => {
     try {
-        student_id = studentData.student_id;
+        const student_id = studentData.student_id.toString();
         if (!student_id) {
             throw new Error('student_id is required');
         }
@@ -28,7 +27,7 @@ const createMultipleStudents = async (studentsData) => {
              throw new Error('studentsData must be an array');
          };
          studentsData.forEach((studentData) => {
-             const student_id = studentData.student_id;
+             const student_id = studentData.student_id.toString();
              if (!student_id) {
                  throw new Error('student_id is required for each student');
              }
@@ -103,4 +102,4 @@ const deleteStudentById = async (student_id) => {
     }
 };
 
-export { createStudent, getStudentById, updateStudentById, deleteStudentById };
+export { createStudent, getStudentById, updateStudentById, deleteStudentById , getAllStudents, createMultipleStudents };

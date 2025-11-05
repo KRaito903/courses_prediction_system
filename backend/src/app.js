@@ -2,7 +2,6 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import mainRouter from './routes/router.js';
-import { admin, db } from './config/firebase.config.js';
 
 const app = express();
 

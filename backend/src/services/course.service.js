@@ -1,11 +1,11 @@
-import { db } from './config/firebase.config.js';
+import { db } from '../config/firebase.config.js';
 
-courseCollection = db.collection('courses');
+const courseCollection = db.collection('courses');
 
 // Create new course
 const createCourse = async (courseData) => {
     try {
-        course_id = courseData.course_id;  
+        const course_id = courseData.course_id.toString();  
         if  (!course_id) {
             throw new Error('course_id is required');
         }
@@ -26,7 +26,7 @@ const createMultipleCourses = async (coursesData) => {
              throw new Error('coursesData must be an array');
          };
          coursesData.forEach((courseData) => {
-             const course_id = courseData.course_id;
+             const course_id = courseData.course_id.toString();
              if (!course_id) {
                  throw new Error('course_id is required for each course');
              }

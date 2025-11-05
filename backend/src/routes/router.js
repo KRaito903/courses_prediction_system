@@ -3,20 +3,17 @@ import { Router } from 'express';
 
 // Import các routes con
 import authRoutes from './auth.routes.js';
-// import userRoutes from './user.routes.js';
-// import courseRoutes from './course.routes.js';
+import courseRoutes from './course.routes.js';
+import studentRouter  from './student.routes.js';
+import enrollmentRouter from './enrollment.routes.js';
 
 // Khởi tạo router chính
 const mainRouter = Router();
 
 // Cắm các routes con vào router chính
 mainRouter.use('/auth', authRoutes); 
+mainRouter.use('/courses', courseRoutes);
+mainRouter.use('/students', studentRouter);
+mainRouter.use('/enrollments', enrollmentRouter);
 
-// // Mọi request đến /user sẽ được chuyển cho userRoutes
-// mainRouter.use('/user', userRoutes);
-
-// // Mọi request đến /course sẽ được chuyển cho courseRoutes
-// mainRouter.use('/course', courseRoutes);
-
-// Xuất router chính
 export default mainRouter;
