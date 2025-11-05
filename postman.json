@@ -1,0 +1,165 @@
+{
+  "info": {
+    "name": "Recomendation System API",
+    "_postman_id": "1234abcd-5678-ef90-gh12-ijklmnop3456",
+    "description": "CRUD API cho Students, Courses, và Enrollments (Firestore)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Students",
+      "item": [
+        {
+          "name": "Get All Students",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/students"
+          }
+        },
+        {
+          "name": "Create Student",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"studentId\": \"S001\",\n  \"name\": \"Nguyen Van A\",\n  \"image\": \"https://example.com/image.jpg\",\n  \"major\": \"Computer Science\",\n  \"gpa\": 3.8\n}"
+            },
+            "url": "{{base_url}}/students"
+          }
+        },
+        {
+          "name": "Update Student",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Nguyen Van A Updated\",\n  \"major\": \"Information Technology\",\n  \"gpa\": 3.9\n}"
+            },
+            "url": "{{base_url}}/students/S001"
+          }
+        },
+        {
+          "name": "Delete Student",
+          "request": {
+            "method": "DELETE",
+            "url": "{{base_url}}/students/S001"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Courses",
+      "item": [
+        {
+          "name": "Get All Courses",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/courses"
+          }
+        },
+        {
+          "name": "Create Course",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"courseId\": \"C001\",\n  \"courseName\": \"Data Structures\",\n  \"courseCode\": \"CS201\",\n  \"semester\": \"Fall 2025\",\n  \"credit\": 3,\n  \"weight\": 0.3\n}"
+            },
+            "url": "{{base_url}}/courses"
+          }
+        },
+        {
+          "name": "Update Course",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"courseName\": \"Data Structures & Algorithms\",\n  \"credit\": 4\n}"
+            },
+            "url": "{{base_url}}/courses/C001"
+          }
+        },
+        {
+          "name": "Delete Course",
+          "request": {
+            "method": "DELETE",
+            "url": "{{base_url}}/courses/C001"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Enrollments",
+      "item": [
+        {
+          "name": "Get All Enrollments",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/enrollments"
+          }
+        },
+        {
+          "name": "Enroll Student in Course",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"studentId\": \"S001\",\n  \"courseId\": \"C001\",\n  \"rating\": 4.5\n}"
+            },
+            "url": "{{base_url}}/enrollments"
+          }
+        },
+        {
+          "name": "Update Enrollment",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"rating\": 4.8\n}"
+            },
+            "url": "{{base_url}}/enrollments/S001/C001"
+          }
+        },
+        {
+          "name": "Delete Enrollment",
+          "request": {
+            "method": "DELETE",
+            "url": "{{base_url}}/enrollments/S001/C001"
+          }
+        },
+        {
+          "name": "Get Courses by Student",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/enrollments/student/S001"
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:3000/api"
+    }
+  ]
+}
