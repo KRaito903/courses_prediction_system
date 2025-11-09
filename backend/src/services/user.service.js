@@ -15,5 +15,23 @@ const getUserById = async (id) => {
     }
 }
 
+// update display name
+const updateUserDisplayName = async (id, displayName) => {
+    try {
+        const userRef = userCollection.doc(id);
+        const userSnapshot = await userRef.get();
+        if (!userSnapshot.exists) {
+            throw new Error("User not found");
+        }
+        await userRef.update({ displayName });
+        const updatedUserDoc = await userRef.get();
+        return updatedUserDoc;
+    } catch (error) {
+        console.error("Error updating user display name:", error);
+        throw new Error("Error updating user display name");
+    }
+};
 
-export { getUserById };
+
+
+export { getUserById, updateUserDisplayName };

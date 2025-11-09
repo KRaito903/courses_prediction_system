@@ -43,9 +43,9 @@ export const getProfile = async (token) => {
  * @param {string} studentId - MSSV của sinh viên
  * @param {object} updateData - Dữ liệu cần cập nhật
  */
-export const updateProfile = async (token, studentId, updateData) => {
+export const updateProfile = async (token, updateData) => {
     try {
-        const response = await put(`/students/${studentId}`, updateData, token);
+        const response = await put(`/auth/user`, updateData, token);
         console.log('✅ Profile updated successfully:', response);
         return response;
     } catch (error) {

@@ -1,7 +1,7 @@
 // src/api/auth.routes.js
 import { Router } from 'express';
 import * as authController from '../controllers/auth.controller.js';
-import { getUser } from '../controllers/user.controller.js';
+import { getUser, updateDisplayName } from '../controllers/user.controller.js';
 
 // Import middleware
 import { checkAuth } from '../middlewares/checkAuth.js';
@@ -18,4 +18,5 @@ router.post('/register-profile', checkAuth, authController.registerProfile);
 // user
 
 router.get('/user', checkAuth, getUser);
+router.put('/user', checkAuth, updateDisplayName);
 export default router;

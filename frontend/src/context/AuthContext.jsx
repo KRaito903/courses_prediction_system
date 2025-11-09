@@ -170,7 +170,6 @@ export const AuthProvider = ({ children }) => {
 
     // Hàm đăng xuất
     const logout = () => {
-        setStudent(null);  // ← Clear student_id on logout
         return signOut(auth);
     };
 

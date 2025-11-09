@@ -1,5 +1,5 @@
 
-import { getUserById } from '../services/user.service.js';
+import { getUserById, updateUserDisplayName } from '../services/user.service.js';
 import { getStudentById } from '../services/student.service.js'
 
 
@@ -18,3 +18,14 @@ export const getUser = async (req, res) => {
     }
 }
 
+export const updateDisplayName = async (req, res) => {
+    const userId = req.user.uid;
+    const { displayName } = req.body;
+    try {
+        const updatedUserDoc = await updateUserDisplayName(userId, displayName);
+        return res.status(200).json({ user: { ...updatedUserDoc.data() } });
+    } catch (error) {
+        console.error('Error updating display name:', error);
+        return res.status(500).json({ message: 'Internal server error' });
+    }
+}
