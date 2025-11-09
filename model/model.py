@@ -15,7 +15,7 @@ class CourseRecommendationModel:
     """Main recommendation system with multiple model support"""
     def __init__(self, data: Dict, embedding_dim: int = 64, num_layers: int = 3,
                  using_unenrolled_for_test: bool = False, unenrolled_rate_in_graph: float = 0.0,
-                 test_split: float = 0.2, valid_split: float = 0.1):
+                 test_split: float = 0.2, valid_split: float = 0.1, model_type: str = 'lightgcn'):
         """
         Args:
             data: Course dataset
@@ -23,6 +23,9 @@ class CourseRecommendationModel:
             num_layers: Number of GNN layers
             unenrolled_rate_in_graph: Rate of including unenrolled courses as negative samples in training
             using_unenrolled_for_test: Whether to use unenrolled courses as test set
+            test_split: Proportion of data to use for test set
+            valid_split: Proportion of data to use for validation set
+            model_type: Type of model to use ('lightgcn', 'gcn', 'graphsage', 'kgat')
         """
         self.data = data
         self.embedding_dim = embedding_dim
@@ -31,7 +34,7 @@ class CourseRecommendationModel:
         self.unenrolled_rate_in_graph = unenrolled_rate_in_graph
         self.test_split = test_split
         self.valid_split = valid_split
-        self.model_type = 'lightgcn'  # 'gcn', 'graphsage', 'kgat'
+        self.model_type = model_type  # 'gcn', 'graphsage', 'kgat'
         
         # Build graph
         self.graph_builder = GraphBuilder(data, self.unenrolled_rate_in_graph)

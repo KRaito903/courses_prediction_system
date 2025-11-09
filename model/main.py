@@ -19,6 +19,7 @@ VISUALIZED_NEIGHBOR_HOPS = 2
 IS_TRAIN_MODEL = False
 IS_EVAL_MODEL = True
 
+IS_RECOMMEND_COURSES = True
 RECOMMENDATION_REQUESTED_FILEPATH = './requests/recommendation_requests.json'
 IS_SAVE_RECOMMENDATIONS = True
 
@@ -163,36 +164,37 @@ def main():
             print(f"    Recall@{k}: {recall:.4f}, NDCG@{k}: {ndcg:.4f}")
 
     # Step 6: Show sample recommendations
-    # Load recommendation requests from file
-    recommendation_requests = DataLoader.load_recommendation_requests(filepath=RECOMMENDATION_REQUESTED_FILEPATH)
-    print(f"\n[6] Generating recommendations for {len(recommendation_requests)} request(s)...")
-    
-    for idx, request in enumerate(recommendation_requests, start=1):
-        student_id = request.get('student_id')
-        semester_filter = request.get('semester_filter')
+    if IS_RECOMMEND_COURSES:
+        # Load recommendation requests from file
+        recommendation_requests = DataLoader.load_recommendation_requests(filepath=RECOMMENDATION_REQUESTED_FILEPATH)
+        print(f"\n[6] Generating recommendations for {len(recommendation_requests)} request(s)...")
         
-        if student_id is None or semester_filter is None:
-            print(f"  Request {idx}: Skipping - missing student_id or semester_filter")
-            continue
-        
-        recommendations = model.recommend_courses(student_id, semester_filter, k=TOP_K,
-                                                  is_save_recommendations=IS_SAVE_RECOMMENDATIONS, 
-                                                  filepath_prefix=RECOMMENDATIONS_FILEPATH_PREFIX)
-        print(f"\n  Request {idx}: Student ID {student_id}, Semester Filter {semester_filter}")
-        print(f"  Top {TOP_K} recommended courses:")
-        # recommendations is a list of dicts: {'rank': int, 'course_id': int, 'score': float}
-        for rec in recommendations:
-            try:
-                rank = int(rec.get('rank', 0))
-                course_id = int(rec.get('course_id'))
-                score = float(rec.get('score'))
-                print(f"    Rank {rank}: Course ID {course_id} with score {score:.4f}")
-            except Exception:
-                # Fallback in case structure changes
-                print(f"    {rec}")
+        for idx, request in enumerate(recommendation_requests, start=1):
+            student_id = request.get('student_id')
+            semester_filter = request.get('semester_filter')
+            
+            if student_id is None or semester_filter is None:
+                print(f"  Request {idx}: Skipping - missing student_id or semester_filter")
+                continue
+            
+            recommendations = model.recommend_courses(student_id, semester_filter, k=TOP_K,
+                                                    is_save_recommendations=IS_SAVE_RECOMMENDATIONS, 
+                                                    filepath_prefix=RECOMMENDATIONS_FILEPATH_PREFIX)
+            print(f"\n  Request {idx}: Student ID {student_id}, Semester Filter {semester_filter}")
+            print(f"  Top {TOP_K} recommended courses:")
+            # recommendations is a list of dicts: {'rank': int, 'course_id': int, 'score': float}
+            for rec in recommendations:
+                try:
+                    rank = int(rec.get('rank', 0))
+                    course_id = int(rec.get('course_id'))
+                    score = float(rec.get('score'))
+                    print(f"    Rank {rank}: Course ID {course_id} with score {score:.4f}")
+                except Exception:
+                    # Fallback in case structure changes
+                    print(f"    {rec}")
 
-    if IS_SAVE_RECOMMENDATIONS:
-        print(f"\n  Recommendations saved to files with prefix '{RECOMMENDATIONS_FILEPATH_PREFIX}'")
- 
+        if IS_SAVE_RECOMMENDATIONS:
+            print(f"\n  Recommendations saved to files with prefix '{RECOMMENDATIONS_FILEPATH_PREFIX}'")
+    
 if __name__ == "__main__":
     main()
