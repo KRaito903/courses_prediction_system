@@ -35,6 +35,7 @@ ENROLLMENT_WEIGHT = {
 }
 
 class DataPreprocessor:
+    """Preprocess course recommendation dataset"""
     @staticmethod
     def preprocess_students(students: List[Dict], max_semester: int = 12, gpa_scale: float = 10.0) -> List[NDArray[np.float32]]:
         """
@@ -158,11 +159,11 @@ class DataPreprocessor:
         }
         if is_save_json:
             filepath = f"{preprocessed_filepath_prefix}_{len(data['students'])}-students_{len(data['courses'])}-courses.json"
-            save_preprocessed_dataset(preprocessed_data, filepath)
+            save_preprocessed_dataset_json(preprocessed_data, filepath)
             print(f"Preprocessed dataset saved to {filepath}")
         return preprocessed_data
     
-def save_preprocessed_dataset(data: Dict, filepath: str = './data/preprocessed-dataset.json'):
+def save_preprocessed_dataset_json(data: Dict, filepath: str = './data/preprocessed-dataset.json'):
     """Save preprocessed dataset to JSON"""
     save_data = {k: v for k, v in data.items() if k not in ['student_features', 'course_features']}
     save_data['student_features'] = data['student_features'].tolist()
@@ -170,16 +171,3 @@ def save_preprocessed_dataset(data: Dict, filepath: str = './data/preprocessed-d
     
     with open(filepath, 'w', encoding='utf-8') as f:
         json.dump(save_data, f, indent=2, ensure_ascii=False)
-
-def load_preprocessed_dataset(filepath: str = './data/preprocessed-dataset.json') -> Dict:
-    """Load preprocessed dataset from JSON"""
-    try:
-        with open(filepath, 'r', encoding='utf-8') as f:
-            data = json.load(f)
-    except UnicodeDecodeError:
-        with open(filepath, 'r', encoding='cp1252') as f:
-            data = json.load(f)
-
-    data['student_features'] = np.array(data['student_features'], dtype=np.float32)
-    data['course_features'] = np.array(data['course_features'], dtype=np.float32)
-    return data

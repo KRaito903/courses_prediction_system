@@ -1,7 +1,7 @@
 {
-    "NUM_STUDENT": 200,
-    "NUM_COURSE": 50,
-    "AVG_ENROLLED_COURSES_PER_STUDENT": 5,
+    "NUM_STUDENT": 500,
+    "NUM_COURSE": 150,
+    "AVG_ENROLLED_COURSES_PER_STUDENT": 8,
     "AVG_WILL_ENROLL_COURSES_PER_STUDENT": 2,
 
     "STUDENT_CODE_LENGTH": 8,
@@ -24,6 +24,8 @@
     "ENROLLMENT_LIST": ["liked", "disliked", "will_enroll"],
     "GENERATED_FILEPATH_PREFIX": "./data/generated-dataset",
     "PREPROCESSED_FILEPATH_PREFIX": "./data/preprocessed-dataset",
+    "TRAINED_MODEL_FILEPATH": "./models/final_model_state.pth",
+    "RECOMMENDATIONS_FILEPATH_PREFIX": "./responses/recommendations",
 
     "ONEHOT_STUDENT_MAJOR" : {
         "MMT hướng ATTT":   [1,0,0,0,0,0,0,0,0],
@@ -56,14 +58,15 @@
         "will_enroll": 0.5
     },
 
-    "NUM_EPOCHS": 100,
+    "NUM_EPOCHS": 1000,
     "BATCH_SIZE": 256,
+    "NUM_NEGATIVE": 5,
     "EARLY_STOPPING_PATIENCE": 10,
     "EARLY_STOPPING_MIN_DELTA": 0.0001,
-    "VALIDATION_SPLIT": 0.1,
-    "k_list": [1, 3, 5],
-    "models_list": ["lightgcn", "gcn", "graphsage", "kgat"],
-    "EMBEDDING_DIM": 64,
+    "TEST_SPLIT": 0.2,
+    "VALID_SPLIT": 0.1,
+    "K_LIST": [1, 3, 5],
+    "EMBEDDING_DIM": 128,
     "NUM_LAYERS": 5,
     "EVAL_INTERVAL": 10,
     "TOP_K": 10
