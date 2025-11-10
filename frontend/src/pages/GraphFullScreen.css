@@ -79,10 +79,27 @@
 .graph-fullscreen-content {
     flex: 1;
     padding: 20px;
-    overflow: auto;
+    overflow: hidden;
     display: flex;
-    align-items: center;
+    align-items: stretch;
     justify-content: center;
+    min-height: 0;
+}
+
+/* Graph wrapper in fullscreen */
+.graph-fullscreen-content .graph-visualization-wrapper {
+    width: 100%;
+    max-width: 100%;
+    height: 100%;
+    max-height: 100%;
+    margin: 0;
+    border-radius: 12px;
+}
+
+.graph-fullscreen-content .vis-network-container {
+    flex: 1;
+    min-height: 0;
+    height: auto;
 }
 
 /* Footer */
@@ -144,6 +161,13 @@
 @media (max-width: 768px) {
     .graph-fullscreen-content {
         padding: 12px;
+    }
+
+    .graph-fullscreen-content .graph-legend {
+        bottom: 140px;
+        right: 12px;
+        padding: 12px;
+        font-size: 0.875rem;
     }
 
     .header-actions {

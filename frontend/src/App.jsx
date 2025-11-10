@@ -17,39 +17,46 @@ import AuthGuard from './components/Common/AuthGuard.jsx';
 
 function App() {
     return (
-        <Layout> {/* Layout bọc tất cả các Routes */}
-            <Routes>
-                {/* Routes công khai */}
-                <Route path="/" element={<HomePage />} />
-                <Route path="/auth" element={<AuthPage />} />
-                <Route path="/contact" element={<ContactPage />} />
+        <Routes>
+            {/* Graph fullscreen route - WITHOUT Layout */}
+            <Route path="/graph-fullscreen" element={
+                <AuthGuard>
+                    <GraphFullScreen />
+                </AuthGuard>
+            } />
+            
+            {/* All other routes - WITH Layout */}
+            <Route path="/*" element={
+                <Layout>
+                    <Routes>
+                        {/* Routes công khai */}
+                        <Route path="/" element={<HomePage />} />
+                        <Route path="/auth" element={<AuthPage />} />
+                        <Route path="/contact" element={<ContactPage />} />
 
-                {/* Routes cần đăng nhập (Dùng AuthGuard) */}
-                <Route path="/profile" element={
-                    <AuthGuard>
-                        <ProfilePage />
-                    </AuthGuard>
-                } />
-                <Route path="/courses" element={
-                    <AuthGuard>
-                        <CoursesPage />
-                    </AuthGuard>
-                } />
-                <Route path="/recommendations" element={
-                    <AuthGuard>
-                        <RecommendationsPage />
-                    </AuthGuard>
-                } />
-                <Route path="/graph-fullscreen" element={
-                    <AuthGuard>
-                        <GraphFullScreen />
-                    </AuthGuard>
-                } />
-                
-                {/* (Tùy chọn: Trang 404) */}
-                {/* <Route path="*" element={<NotFoundPage />} /> */}
-            </Routes>
-        </Layout>
+                        {/* Routes cần đăng nhập (Dùng AuthGuard) */}
+                        <Route path="/profile" element={
+                            <AuthGuard>
+                                <ProfilePage />
+                            </AuthGuard>
+                        } />
+                        <Route path="/courses" element={
+                            <AuthGuard>
+                                <CoursesPage />
+                            </AuthGuard>
+                        } />
+                        <Route path="/recommendations" element={
+                            <AuthGuard>
+                                <RecommendationsPage />
+                            </AuthGuard>
+                        } />
+                        
+                        {/* (Tùy chọn: Trang 404) */}
+                        {/* <Route path="*" element={<NotFoundPage />} /> */}
+                    </Routes>
+                </Layout>
+            } />
+        </Routes>
     );
 }
 
