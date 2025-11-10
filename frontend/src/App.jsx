@@ -10,6 +10,7 @@ import ProfilePage from './pages/ProfilePage.jsx';
 import CoursesPage from './pages/CoursesPage.jsx';
 import RecommendationsPage from './pages/RecommendationsPage.jsx';
 import ContactPage from './pages/ContactPage.jsx';
+import GraphFullScreen from './pages/GraphFullScreen.jsx';
 
 // (Tùy chọn) Component bảo vệ route
 import AuthGuard from './components/Common/AuthGuard.jsx';
@@ -37,6 +38,11 @@ function App() {
                 <Route path="/recommendations" element={
                     <AuthGuard>
                         <RecommendationsPage />
+                    </AuthGuard>
+                } />
+                <Route path="/graph-fullscreen" element={
+                    <AuthGuard>
+                        <GraphFullScreen />
                     </AuthGuard>
                 } />
                 
