@@ -12,6 +12,14 @@ const ProfilePage = () => {
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
 
+    // New: Student info editing states
+    const [editingStudentInfo, setEditingStudentInfo] = useState(false);
+    const [studentInfoData, setStudentInfoData] = useState({
+        gpa: student?.student?.gpa || '',
+        semester: student?.student?.semester || '',
+        student_major_code: student?.student?.student_major_code || ''
+    });
+
     const formatDate = (value) => {
         if (!value) return 'Chưa cập nhật';
         const date = new Date(value);
@@ -57,6 +65,66 @@ const ProfilePage = () => {
     const handleCancel = () => {
         setNewDisplayName(student?.user?.displayName || '');
         setEditingDisplayName(false);
+        setError('');
+        setSuccess('');
+    };
+
+    // New: Handle student info save
+    const handleSaveStudentInfo = async () => {
+        // Validation
+        const gpa = parseFloat(studentInfoData.gpa);
+        const semester = parseInt(studentInfoData.semester);
+
+        if (isNaN(gpa) || gpa < 0 || gpa > 10) {
+            setError('GPA must be between 0 and 10');
+            return;
+        }
+
+        if (isNaN(semester) || semester < 1 || semester > 12) {
+            setError('Semester must be between 1 and 12');
+            return;
+        }
+
+        if (!studentInfoData.student_major_code.trim()) {
+            setError('Major code cannot be empty');
+            return;
+        }
+
+        try {
+            setLoading(true);
+            setError('');
+            setSuccess('');
+
+            const token = await currentUser.getIdToken();
+            await profileService.updateStudent(
+                token,
+                student?.student?.id,
+                {
+                    gpa: gpa,
+                    semester: semester,
+                    student_major_code: studentInfoData.student_major_code.trim()
+                }
+            );
+
+            setSuccess('✅ Student info updated successfully!');
+            setEditingStudentInfo(false);
+            window.location.reload();
+        } catch (err) {
+            console.error('❌ Error updating student info:', err);
+            setError(err.message || 'Failed to update student info');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // New: Handle cancel student info edit
+    const handleCancelStudentInfo = () => {
+        setStudentInfoData({
+            gpa: student?.student?.gpa || '',
+            semester: student?.student?.semester || '',
+            student_major_code: student?.student?.student_major_code || ''
+        });
+        setEditingStudentInfo(false);
         setError('');
         setSuccess('');
     };
@@ -216,8 +284,178 @@ const ProfilePage = () => {
                          <div>
                             <strong style={{ color: 'var(--text-light)', fontSize: '0.9rem' }}>Ngày tạo:</strong>
                             <p style={{ margin: '0.25rem 0 0', fontSize: '1.1rem', color: 'var(--text-dark)' }}>
-                                {formatDate(student?.createdAt)}
+                                {formatDate(student?.user?.createdAt)}
                             </p>
+                        </div>
+
+                        {/* New: Student Info Section */}
+                        <div style={{ 
+                            gridColumn: '1 / -1',
+                            borderTop: '2px solid var(--border-color)',
+                            paddingTop: '1.5rem',
+                            marginTop: '1rem'
+                        }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                                <h3 style={{ margin: 0, color: 'var(--text-dark)' }}>📊 Thông Tin Học Tập</h3>
+                                {!editingStudentInfo && (
+                                    <button
+                                        onClick={() => {
+                                            setEditingStudentInfo(true);
+                                            setError('');
+                                            setSuccess('');
+                                        }}
+                                        style={{
+                                            padding: '0.35rem 0.75rem',
+                                            backgroundColor: 'var(--primary-color)',
+                                            color: 'white',
+                                            border: 'none',
+                                            borderRadius: '4px',
+                                            cursor: 'pointer',
+                                            fontSize: '0.85rem',
+                                            fontWeight: '600',
+                                            transition: 'all 0.2s'
+                                        }}
+                                        onMouseEnter={(e) => e.target.style.opacity = '0.8'}
+                                        onMouseLeave={(e) => e.target.style.opacity = '1'}
+                                    >
+                                        ✏️ Edit All
+                                    </button>
+                                )}
+                            </div>
+
+                            {editingStudentInfo ? (
+                                <div style={{ display: 'grid', gap: '1rem' }}>
+                                    {/* GPA Input */}
+                                    <div>
+                                        <label style={{ color: 'var(--text-light)', fontSize: '0.9rem', fontWeight: '600' }}>GPA (0-4):</label>
+                                        <input
+                                            type="number"
+                                            min="0"
+                                            max="4"
+                                            step="0.01"
+                                            value={studentInfoData.gpa}
+                                            onChange={(e) => setStudentInfoData({...studentInfoData, gpa: e.target.value})}
+                                            placeholder="Enter GPA"
+                                            style={{
+                                                width: '100%',
+                                                padding: '0.5rem',
+                                                border: '1px solid var(--border-color)',
+                                                borderRadius: '6px',
+                                                fontSize: '1rem',
+                                                fontFamily: 'inherit',
+                                                marginTop: '0.25rem'
+                                            }}
+                                            disabled={loading}
+                                        />
+                                    </div>
+
+                                    {/* Semester Input */}
+                                    <div>
+                                        <label style={{ color: 'var(--text-light)', fontSize: '0.9rem', fontWeight: '600' }}>Semester (1-12):</label>
+                                        <select
+                                            value={studentInfoData.semester}
+                                            onChange={(e) => setStudentInfoData({...studentInfoData, semester: e.target.value})}
+                                            style={{
+                                                width: '100%',
+                                                padding: '0.5rem',
+                                                border: '1px solid var(--border-color)',
+                                                borderRadius: '6px',
+                                                fontSize: '1rem',
+                                                fontFamily: 'inherit',
+                                                marginTop: '0.25rem'
+                                            }}
+                                            disabled={loading}
+                                        >
+                                            <option value="">-- Select Semester --</option>
+                                            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(sem => (
+                                                <option key={sem} value={sem}>{sem}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+
+                                    {/* Major Code Input */}
+                                    <div>
+                                        <label style={{ color: 'var(--text-light)', fontSize: '0.9rem', fontWeight: '600' }}>Chuyên Ngành:</label>
+                                        <input
+                                            type="text"
+                                            value={studentInfoData.student_major_code}
+                                            onChange={(e) => setStudentInfoData({...studentInfoData, student_major_code: e.target.value})}
+                                            placeholder="Enter major code"
+                                            style={{
+                                                width: '100%',
+                                                padding: '0.5rem',
+                                                border: '1px solid var(--border-color)',
+                                                borderRadius: '6px',
+                                                fontSize: '1rem',
+                                                fontFamily: 'inherit',
+                                                marginTop: '0.25rem'
+                                            }}
+                                            disabled={loading}
+                                        />
+                                    </div>
+
+                                    {/* Action Buttons */}
+                                    <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                        <button
+                                            onClick={handleSaveStudentInfo}
+                                            disabled={loading}
+                                            style={{
+                                                flex: 1,
+                                                padding: '0.5rem 1rem',
+                                                backgroundColor: 'var(--primary-color)',
+                                                color: 'white',
+                                                border: 'none',
+                                                borderRadius: '6px',
+                                                cursor: loading ? 'not-allowed' : 'pointer',
+                                                fontWeight: '600',
+                                                opacity: loading ? 0.6 : 1
+                                            }}
+                                        >
+                                            {loading ? '⏳ Saving...' : '✅ Save'}
+                                        </button>
+                                        <button
+                                            onClick={handleCancelStudentInfo}
+                                            disabled={loading}
+                                            style={{
+                                                flex: 1,
+                                                padding: '0.5rem 1rem',
+                                                backgroundColor: '#f3f4f6',
+                                                color: 'var(--text-dark)',
+                                                border: '1px solid var(--border-color)',
+                                                borderRadius: '6px',
+                                                cursor: loading ? 'not-allowed' : 'pointer',
+                                                fontWeight: '600',
+                                                opacity: loading ? 0.6 : 1
+                                            }}
+                                        >
+                                            ✕ Cancel
+                                        </button>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1rem' }}>
+                                    <div style={{ padding: '1rem', backgroundColor: 'var(--bg-light)', borderRadius: '8px' }}>
+                                        <p style={{ margin: '0 0 0.5rem 0', color: 'var(--text-light)', fontSize: '0.85rem', fontWeight: '600' }}>GPA</p>
+                                        <p style={{ margin: 0, fontSize: '1.5rem', fontWeight: '700', color: 'var(--primary-color)' }}>
+                                            {student?.student?.gpa || 'N/A'}
+                                        </p>
+                                    </div>
+
+                                    <div style={{ padding: '1rem', backgroundColor: 'var(--bg-light)', borderRadius: '8px' }}>
+                                        <p style={{ margin: '0 0 0.5rem 0', color: 'var(--text-light)', fontSize: '0.85rem', fontWeight: '600' }}>Kỳ Học</p>
+                                        <p style={{ margin: 0, fontSize: '1.5rem', fontWeight: '700', color: 'var(--primary-color)' }}>
+                                            {student?.student?.semester || 'N/A'}
+                                        </p>
+                                    </div>
+
+                                    <div style={{ padding: '1rem', backgroundColor: 'var(--bg-light)', borderRadius: '8px' }}>
+                                        <p style={{ margin: '0 0 0.5rem 0', color: 'var(--text-light)', fontSize: '0.85rem', fontWeight: '600' }}>Chuyên Ngành</p>
+                                        <p style={{ margin: 0, fontSize: '1rem', fontWeight: '600', color: 'var(--text-dark)' }}>
+                                            {student?.student?.student_major_code || 'N/A'}
+                                        </p>
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>

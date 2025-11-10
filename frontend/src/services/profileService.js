@@ -53,3 +53,18 @@ export const updateProfile = async (token, updateData) => {
         throw error;
     }
 };
+
+
+
+
+export const updateStudent = async (token, studentId, updateData) => {
+    try {
+        const response = await put(`/students/${studentId}`, updateData, token);
+        console.log('✅ Profile updated successfully:', response);
+        return response;
+    } catch (error) {
+        console.error('❌ Error updating profile:', error.message);
+        throw error;
+    }
+};
+

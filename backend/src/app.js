@@ -2,10 +2,16 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import mainRouter from './routes/router.js';
+import { setUpRole } from './utils/setupRole.js';
 
 const app = express();
 
 dotenv.config();
+
+setUpRole(process.env.ADMIN_UID, 'admin').catch((error) => {
+    console.error('Failed to set up admin role:', error);
+});
+
 
 // Middleware
 app.use(cors(

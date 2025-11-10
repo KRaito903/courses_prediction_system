@@ -108,7 +108,8 @@ export const AuthProvider = ({ children }) => {
             
             console.log('✅ Profile đã được tạo thành công!');
             alert('🎉 Chào mừng! Tài khoản của bạn đã được kích hoạt.');
-            
+            // Reload page to reflect changes
+            window.location.reload();
             return true;
         } catch (error) {
             // Nếu lỗi là profile đã tồn tại → cũng OK, xóa pending data
@@ -155,15 +156,14 @@ export const AuthProvider = ({ children }) => {
                 if (freshUser) {
                     await freshUser.reload();
                     await createUserProfile(freshUser);
+                    const token = await userCredential.user.getIdToken();
+                    const data = await profileService.getProfile(token);
+                    setStudent(data);  // ← Set student from fetched profile
                 }
             } catch (err) {
                 console.error('Error creating profile after login:', err);
             }
         }, 800);
-        const token = await userCredential.user.getIdToken();
-        const data = await profileService.getProfile(token);
-
-        setStudent(data);  // ← Set student from fetched profile
 
         return userCredential;
     };
