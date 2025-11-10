@@ -1,5 +1,5 @@
 
-import { getUserById, updateUserDisplayName } from '../services/user.service.js';
+import { getUserById, updateUserDisplayName, getAllUsers, deleteUserById } from '../services/user.service.js';
 import { getStudentById } from '../services/student.service.js'
 
 

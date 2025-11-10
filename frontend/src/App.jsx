@@ -12,12 +12,23 @@ import RecommendationsPage from './pages/RecommendationsPage.jsx';
 import ContactPage from './pages/ContactPage.jsx';
 import GraphFullScreen from './pages/GraphFullScreen.jsx';
 
+// Admin pages
+import AdminDashboard from './pages/admin/AdminDashboard.jsx';
+import AdminUsers from './pages/admin/AdminUsers.jsx';
+import AdminModel from './pages/admin/AdminModel.jsx';
+
 // (Tùy chọn) Component bảo vệ route
 import AuthGuard from './components/Common/AuthGuard.jsx';
+import AdminGuard from './components/common/AdminGuard.jsx';
+import AdminDebug from './components/common/AdminDebug.jsx';
 
 function App() {
     return (
-        <Routes>
+        <>
+            {/* Debug component - chỉ hiện trong development */}
+            <AdminDebug />
+            
+            <Routes>
             {/* Graph fullscreen route - WITHOUT Layout */}
             <Route path="/graph-fullscreen" element={
                 <AuthGuard>
@@ -50,13 +61,31 @@ function App() {
                                 <RecommendationsPage />
                             </AuthGuard>
                         } />
+
+                        {/* Admin Routes - Protected by AdminGuard */}
+                        <Route path="/admin" element={
+                            <AdminGuard>
+                                <AdminDashboard />
+                            </AdminGuard>
+                        } />
+                        <Route path="/admin/users" element={
+                            <AdminGuard>
+                                <AdminUsers />
+                            </AdminGuard>
+                        } />
+                        <Route path="/admin/model" element={
+                            <AdminGuard>
+                                <AdminModel />
+                            </AdminGuard>
+                        } />
                         
                         {/* (Tùy chọn: Trang 404) */}
                         {/* <Route path="*" element={<NotFoundPage />} /> */}
                     </Routes>
                 </Layout>
             } />
-        </Routes>
+            </Routes>
+        </>
     );
 }
 

@@ -43,8 +43,8 @@ export const createEnrollment = async (token, student_id, course_id, type = 'neu
             throw new Error('Token, student_id, and course_id are required');
         }
 
-        if (!['liked', 'disliked', 'neutral'].includes(type)) {
-            throw new Error('Type must be one of: liked, disliked, neutral');
+        if (!['liked', 'disliked', 'will_enroll'].includes(type)) {
+            throw new Error('Type must be one of: liked, disliked, will_enroll');
         }
 
         const enrollmentData = {

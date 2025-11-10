@@ -376,11 +376,9 @@ const ProfilePage = () => {
                                     {/* Major Code Input */}
                                     <div>
                                         <label style={{ color: 'var(--text-light)', fontSize: '0.9rem', fontWeight: '600' }}>Chuyên Ngành:</label>
-                                        <input
-                                            type="text"
+                                        <select
                                             value={studentInfoData.student_major_code}
                                             onChange={(e) => setStudentInfoData({...studentInfoData, student_major_code: e.target.value})}
-                                            placeholder="Enter major code"
                                             style={{
                                                 width: '100%',
                                                 padding: '0.5rem',
@@ -391,7 +389,19 @@ const ProfilePage = () => {
                                                 marginTop: '0.25rem'
                                             }}
                                             disabled={loading}
-                                        />
+                                        >
+                                            <option value="">-- Chọn Chuyên Ngành --</option>
+                                            <option value="MMT hướng ATTT">MMT hướng ATTT</option>
+                                            <option value="MMT">MMT</option>
+                                            <option value="HTTT">HTTT</option>
+                                            <option value="KTPM">KTPM</option>
+                                            <option value="KHMT hướng TTNT">KHMT hướng TTNT</option>
+                                            <option value="CNTThuc">CNTThuc</option>
+                                            <option value="TGMT">TGMT</option>
+                                            <option value="KHDL">KHDL</option>
+                                            <option value="ATTT">ATTT</option>
+                                            <option value="CNTTin">CNTTin</option>
+                                        </select>
                                     </div>
 
                                     {/* Action Buttons */}

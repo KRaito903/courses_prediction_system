@@ -24,6 +24,7 @@ export const useAuth = () => {
 export const AuthProvider = ({ children }) => {
     const [currentUser, setCurrentUser] = useState(null);
     const [student, setStudent] = useState(null);  // ← New: Store student
+    const [userRole, setUserRole] = useState(null);  // ← New: Store user role (admin, user, etc.)
     const [loading, setLoading] = useState(true);
 
     // Hàm đăng ký - CHỈ tạo Firebase Auth user, KHÔNG tạo profile ngay
@@ -180,9 +181,19 @@ export const AuthProvider = ({ children }) => {
             console.log('🔔 onAuthStateChanged triggered. User:', user);
             if (user) {
                 try {
-                    // Reload to get latest emailVerified
+                    // Reload to get latest emailVerified and custom claims
                     await user.reload();
                     const freshUser = auth.currentUser;
+                    
+                    // Get ID token with custom claims
+                    const tokenResult = await freshUser.getIdTokenResult();
+                    console.log('🔑 Custom claims:', tokenResult.claims);
+                    
+                    // Extract role from custom claims
+                    const role = tokenResult.claims.role || 'user';
+                    setUserRole(role);
+                    console.log('👤 User role:', role);
+                    
                     const token = await freshUser.getIdToken();
                     const data = await profileService.getProfile(token);
                     setStudent(data);  // ← Set student from fetched profile
@@ -241,11 +252,13 @@ export const AuthProvider = ({ children }) => {
     const value = {
         currentUser,
         student,
+        userRole,
         loading,
         register,
         login,
         logout,
-        createUserProfile
+        createUserProfile,
+        isAdmin: userRole === 'admin'
     };
 
     return (
